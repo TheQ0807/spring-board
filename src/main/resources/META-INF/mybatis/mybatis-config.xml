@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	
+	<typeAliases>
+		<typeAlias alias="User" type="com.sample.user.vo.User"/>
+		<typeAlias alias="Board" type="com.sample.board.vo.Board"/>
+		<typeAlias alias="Comment" type="com.sample.board.vo.Comment"/>
+		<typeAlias alias="Todo" type="com.sample.rest.vo.Todo"/>
+		<typeAlias alias="Pagination" type="com.sample.web.pagination.Pagination"/>
+	</typeAliases>
+	
+	<mappers>
+		<mapper resource="META-INF/mybatis/mappers/board.xml" />
+		<mapper resource="META-INF/mybatis/mappers/user.xml" />
+		<mapper resource="META-INF/mybatis/mappers/todo.xml" />
+	</mappers>
+	
+</configuration>

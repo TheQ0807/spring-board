@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sample.rest.mappers.TodoMapper">
+	
+	<select id="getSeq" resultType="int">
+		select todo_seq.nextval from dual
+	</select>
+	
+	<insert id="addTodo" parameterType="Todo">
+		insert into tb_todos
+			(todo_no, todo_title, todo_description, todo_dates)
+		values
+			(#{no}, #{title}, #{description}, #{dates})
+	</insert>
+	
+	 <select id="getTodos" resultType="Todo">
+	 	select
+	 		todo_no				no,
+	 		todo_title			title,
+	 		todo_description	description,
+	 		todo_dates			dates
+	 	from
+	 		tb_todos
+	 	
+	 </select>
+	 
+	  <select id="getTodo" parameterType="int" resultType="Todo">
+	 	select
+	 		todo_no				no,
+	 		todo_title			title,
+	 		todo_description	description,
+	 		todo_dates			dates
+	 	from
+	 		tb_todos
+	 	where
+	 		todo_no = #{value}
+	 </select>
+	 
+	 <delete id="deleteTodo" parameterType="int">
+	 	delete from
+	 		tb_todos
+	 	where
+	 		todo_no = #{value}
+	 </delete>
+	
+	<update id="updateTodo" parameterType="Todo">
+		update
+			tb_todos
+		set
+			todo_title = #{title},
+			todo_description = #{description},
+			todo_dates = #{dates}
+		where
+			todo_no = #{no}
+	</update>
+</mapper>

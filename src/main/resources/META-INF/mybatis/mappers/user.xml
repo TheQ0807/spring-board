@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sample.user.mappers.UserMapper">
+	
+	<select id="getUserById" parameterType="string" resultType="User">
+		select
+			user_no			as no,
+			user_fullname	as fullname,
+			user_id			as id,
+			user_password	as password,
+			user_birth		as birth,
+			user_email		as email,
+			user_phone		as phone,
+			user_createdate	as createdate,
+			user_point		as point
+		from
+			tb_users
+		where
+			user_id = #{value}
+	</select>
+	
+	<insert id="addUser" parameterType="User">
+		insert into tb_users
+			(user_no, user_fullname, user_id, user_password, user_birth, user_email, user_phone)
+		values
+			(user_seq.nextval, #{fullname}, #{id}, #{password}, #{birth}, #{email}, #{phone})
+	</insert>
+	
+	<update id="updateUser" parameterType="User">
+		update tb_users
+		<set>
+			<if test="password != null">user_password = #{password},</if>
+			<if test="email != null">user_email = #{email},</if>
+			<if test="phone != null">user_phone = #{phone},</if>
+			<if test="point != null">user_point = #{point},</if>
+		</set>
+		where
+			user_no = #{no}
+	</update>
+	
+</mapper>

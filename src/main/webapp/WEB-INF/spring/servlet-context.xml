@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+
+	<mvc:annotation-driven />
+
+
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/*.do"/>
+			<mvc:mapping path="/*/*.do"/>
+			<ref bean="loginCheckInterceptor"/>
+		</mvc:interceptor>
+	</mvc:interceptors>
+	
+	<!--  로그인이 필요없는(혹은 필요한/ 무엇이든 주입할수있다.) url을 등록시킨다. 띄어쓰기가 있으면 안됨 -->	
+	<util:set id="urlSet">
+		<value>/home.do</value>
+		<value>/user/form.do</value>
+		<value>/user/add.do</value>
+		<value>/user/login.do</value>
+		<value>/user/idcheck.do</value>
+		<value>/board/home.do</value>
+		<value>/board/list.do</value>
+		<value>/board/detail.do</value>
+		<value>/board/filedownload.do</value>
+		<value>/board/getComments.do</value>
+	</util:set>
+	
+	<bean id="loginCheckInterceptor"  class="com.sample.web.intercepter.LoginCheckInterceptor">
+		<property name="urlSet" ref="urlSet" />
+	</bean>
+	
+	<!-- 기본적으로 등록이 되어있지만 지금 다시 등록한것임 view의 이름이 .jsp jsp를 건내받으면 리다이렉팅해주는걸 반환하는것이다. -->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="utf-8" />
+	</bean>
+	
+	<!--  파일 다운로드 기능구현을 빈에 등록 -->
+	<bean class="com.sample.web.view.FileDownloadView"/>
+	<!--  엑셀파일로 다운하기 엑셀뷰 -->
+	<bean class="com.sample.web.view.ExcelView"/>
+	
+	<context:property-placeholder location="classpath:/META-INF/properties/config.properties"/>
+	
+	
+	<context:component-scan base-package="com.sample">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+		<context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.RestController"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+	</context:component-scan>
+
+		
+
+</beans>

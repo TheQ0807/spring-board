@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sample.board.mappers.BoardMapper">
+	
+	<select id="getSeq" resultType="int">
+		select board_seq.nextval from dual
+	</select>
+	
+	<select id="getTotalRows" parameterType="Pagination" resultType="int">
+			select
+				count(*)
+			from
+				tb_boards A, tb_users B
+			where
+				board_deleted = 'N'
+				and A.board_writer = B.user_no
+				<if test="keyword != ''">
+					<choose>
+						<when test="opt == 'title'">
+							and board_title like '%' || #{keyword} || '%'
+						</when>
+						<when test="opt == 'writer'">
+							and B.user_fullname like '%' || #{keyword} || '%'
+						</when>
+						<when test="opt == 'contents'">
+							and board_contents like '%' || #{keyword} || '%'
+						</when>
+					</choose>
+				</if>
+	</select>
+	
+	<select id="getBoards" resultType="Board" parameterType="Pagination">
+		select
+			row_number() over (order by board_no desc) rn,
+			board_no						as no,
+			board_title					as title,
+			board_writer					as "writer.no",
+			user_fullname					as "writer.fullname",
+			board_contents				as contents,
+			board_filename				as filename,
+			board_likes					as likes,
+			board_createdate				as createdate
+		from(
+			select
+				row_number() over (order by board_no desc) rn,
+				A.board_no	,				
+				A.board_title,					
+				A.board_writer,					
+				B.user_fullname,					
+				A.board_contents,				
+				A.board_filename,				
+				A.board_likes,				
+				A.board_createdate
+			from
+				tb_boards A, tb_users B
+			where
+				board_deleted = 'N'
+				and A.board_writer = B.user_no
+				<if test="keyword != ''">
+					<choose>
+						<when test="opt == 'title'">
+							and board_title like '%' || #{keyword} || '%'
+						</when>
+						<when test="opt == 'writer'">
+							and B.user_fullname like '%' || #{keyword} || '%'
+						</when>
+						<when test="opt == 'contents'">
+							and board_contents like '%' || #{keyword} || '%'
+						</when>
+					</choose>
+				</if>
+		)
+		where
+			rn >= #{beginIndex} and rn &lt; = #{endIndex}
+	</select>
+	
+	<insert id="addBoard" parameterType="Board">
+		insert into tb_boards
+			(board_no, board_title, board_writer, board_contents, board_filename)
+		values
+			(board_seq.nextval, #{title}, #{writer.no}, #{contents}, #{filename, jdbcType=VARCHAR})
+	</insert>
+	
+	<select id="getBoard" parameterType="int" resultType="Board">
+		select
+			A.board_no			as no,
+			A.board_title		as title,
+			A.board_writer		as "writer.no",
+			B.user_fullname		as "writer.fullname",
+			A.board_contents	as contents,
+			A.board_filename	as filename,
+			A.board_likes		as likes,
+			A.board_createdate	as createdate
+		from
+			tb_boards A, tb_users B
+		where
+			A.board_writer = B.user_no
+			and board_deleted = 'N'
+			and board_no = #{value}
+	</select>
+	
+	<insert id="addComment" parameterType="Comment">
+		insert into tb_comments
+			(comm_no, comm_contents, comm_writer, board_no, comm_createdate)
+		values
+			(#{no}, #{contents}, #{writer.no}, #{board.no}, #{createdate})
+	</insert>
+	
+	<select id="getCommentsByBoardNo" parameterType="int" resultType="Comment">
+		select
+			A.comm_no			as no,
+			A.comm_contents		as contents,
+			A.comm_createdate	as createdate,
+			A.comm_writer		as "writer.no",
+			B.user_fullname		as "writer.fullname",
+			A.board_no			as "board.no"
+		from
+			tb_comments A, tb_users B
+		where
+			A.board_no = #{value}
+			and A.comm_writer = B.user_no
+		order by
+			comm_no asc
+	</select>
+	
+	<select id="getComment" parameterType="int" resultType="Comment">
+		select
+			A.comm_no			as no,
+			A.comm_contents		as contents,
+			A.comm_createdate	as createdate,
+			A.comm_writer		as "writer.no",
+			B.user_fullname		as "writer.fullname",
+			A.board_no			as "board.no"
+		from
+			tb_comments A, tb_users B
+		where
+			A.comm_no = #{value}
+			and A.comm_writer = B.user_no
+	</select>
+	
+	
+	<delete id="deleteComment" parameterType="int">
+		delete from
+			tb_comments
+		where
+			comm_no = #{value}
+	</delete>
+	
+	
+</mapper>
